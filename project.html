@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Ganpati Bappa Morya</title>
+	<script src="https://d3js.org/d3.v3.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<style>
+    	text { 
+			font-family: Arial; 
+			font-size: 12px;
+		}
+		.axis path, .axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		.tick text {
+			fill: black;
+			font-size: 11px;
+		}
+		
+		.xaxis .text{
+		padding-left:2 px;
+		
+		}
+		
+		.svg-align{
+		padding-top: 0px;
+		padding-left: 0px;
+		}
+		
+		.svg-align1{
+		padding-top: 50px;
+		padding-left: 0px;
+		}
+
+		/*rect {
+			stroke: white;
+		}*/
+		
+		div.tooltip {	
+			position: absolute;			
+			text-align: center;			
+			width: 60px;					
+			height: 28px;					
+			padding: 2px;				
+			font: 8px sans-serif;		
+			background: lightsteelblue;	
+			border: 0px;		
+			border-radius: 8px;			
+			pointer-events: none;			
+		}
+		
+		/*body { font: 12px Arial;}*/
+ 
+		path { 
+		  stroke: steelblue;
+		  stroke-width: 2;
+		  fill: none;
+		}
+		 
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: grey;
+			stroke-width: 1;
+			shape-rendering: crispEdges;
+		}
+		
+		
+	</style>
+</head>
+<body>
+    <div> </div>
+   
+	<svg id="svg1" class="svg-align" width="400" height="500">
+		<g transform="translate(30,40)"></g>
+	</svg>
+	
+	<svg id="svg2" width="500" height="412">
+		<g transform="translate(30,40)" ></g>
+	</svg>
+	
+	<svg id="svg3" width="450" height="500">	
+		<g transform="translate(30,40)"></g>
+	</svg>
+	
+	<svg id="svg4" width="450" height="500">	
+		<g transform="translate(30,40)"></g>
+	</svg>
+
+	
+	<script>
+	    //-------------------------------------------------------------Global Variable--------------------
+        //Global variables
+		var CHART_WIDTH = 490;
+		var CHART_HEIGHT = 200;
+		var MAX_BAR_HEIGHT = 100;
+		var padding = 100;
+		
+		var pathData = [];
+		var pumpData = [];
+	//	var deathLocData = [];
+		var deathLocDataCopy = []
+		var genderDeaths = [];
+		var ageDeaths = [];
+		var deathsByDate =[];
+		var deathLocDataByDate=[];
+        
+		var totalDeaths = 0;
+        var totalFemaleDeaths = 0;
+        var totalMaleDeaths = 0; 		
+       
+	    var ageGroup10 = 0;  
+		var ageGroup20 = 0;  
+		var ageGroup40 = 0;  
+		var ageGroup60 = 0;  
+		var ageGroup80 = 0;  
+		var ageGroup100 = 0;  
+		
+	   
+        var div = d3.select("body").append("div")	
+		.attr("class", "tooltip")				
+		.style("opacity", 0);	   
+        
+		
+		//-------------------------------------------------------------Draw Functions--------------------
+        //To draw paths  		
+		function drawPathPlot() 
+		{
+			var pathGenerator = d3.svg.line()
+				.x(function(d) { return d.x*16; })
+				.y(function(d) { return d.y*16; });
+
+			var g = d3.select('#svg1').select('g');
+
+    		g.append('path')
+    			.style('fill', 'none')
+    			.style('stroke', 'grey')
+    			.style('stroke-width', '3px')
+    			.attr('d', pathGenerator(pathData))
+				.call(d3.behavior.zoom().on("zoom", function () {
+					g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+				  }));
+		}
+		
+		//To draw pumps loc
+		function drawPumpPlot() 
+		{
+			var g = d3.select('#svg1').select('g');
+
+    		g.selectAll('circle')
+    			.data(pumpData)
+    			.enter()
+    			.append('circle')
+    			.style('fill', 'red')
+    			.attr('r', 4)
+    			.attr('cx', function(d) { return d.x*16 })
+    			.attr('cy', function(d) { return d.y*16 });
+		}
+		
+		//To draw each death location
+		function drawDealthLocPlot(deathLocData) 
+		{
+			var g = d3.select('#svg1').select('g');
+            var tooltip = d3.select("body")
+						.append("div")
+						.style("position", "absolute")
+						.style("z-index", "10")
+						.style("visibility", "hidden")
+			
+    		g.selectAll('circle')
+    			.data(deathLocData)
+    			.enter()
+    			.append('circle')
+    			.style('fill', function(d) {  if(d.gender=='1') return 'blue'; else return 'orange'; })
+    			.attr('r', 1)
+    			.attr('cx', function(d) { return d.x*16 })
+    			.attr('cy', function(d) { return d.y*16 })
+			    .on("mouseover", function(d) {		
+					div.transition()		
+				    .duration(200)		
+					.style("opacity", .9);		
+					div.html("Age:" + "<br/>"+d.age)	
+					.style("left", (d3.event.pageX) + "px")		
+					.style("top", (d3.event.pageY - 28) + "px");	
+					})					
+				.on("mouseout", function(d) {		
+							div.transition()		
+							.duration(500)		
+							.style("opacity", 0);	
+					});
+		}
+		
+		//To make graph interactive
+		function drawTimelineDeathsPerDay(){
+
+				// Set the dimensions of the canvas / graph
+				var	margin = {top: 30, right: 20, bottom: 30, left: 50},
+					width = 500 - margin.left - margin.right,
+					height = 250 - margin.top - margin.bottom;
+				 
+				// Parse the date / time
+				//var parseDate = d3.time.format("%d-%b-%y").parse;
+				var formatDate = d3.time.format("%d-%b"),
+				bisectDate = d3.bisector(function(d) { return d.date; }).left;
+				 
+				// Set the ranges
+				var	x = d3.time.scale().range([0, width]);
+				var	y = d3.scale.linear().range([height, 0]);
+				 
+				// Define the axes
+				var	xAxis = d3.svg.axis().scale(x)
+					.orient("bottom").ticks(5);
+				 
+				var	yAxis = d3.svg.axis().scale(y)
+					.orient("left").ticks(5);
+				 
+				// Define the line
+				var	valueline = d3.svg.line()
+					.x(function(d) { return x(d.date); })
+					.y(function(d) { return y(d.deaths); });
+					
+				// Adds the svg canvas
+				var	svg = d3.select("#svg2")
+					.append("g")
+						.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+						
+				var lineSvg = svg.append("g");
+				var focus = svg.append("g") 
+					.style("display", "none");		
+						
+				 
+				// Get the data
+				d3.csv("deathdays.csv", function(error, data) {
+					var parseDate = d3.time.format("%d-%b");
+					data.forEach(function(d) {
+						d.date =  parseDate.parse(d.date);
+						d.deaths = +d.deaths;
+					});
+				 
+					// Scale the range of the data
+					x.domain(d3.extent(data, function(d) { return d.date; }));
+					y.domain([0, d3.max(data, function(d) { return d.deaths; })]);
+				 
+					 // Add the valueline path.
+					lineSvg.append("path")
+					.attr("class", "line")
+					.attr("d", valueline(data));
+					
+					
+					// Add the valueline path.
+				/*	svg.append("path")	
+						.attr("class", "line")
+						.attr("d", valueline(data)); */
+				 
+					// Add the X Axis
+					svg.append("g")		
+						.attr("class", "x axis")
+						.attr("transform", "translate(0," + height + ")")
+						.call(xAxis);
+				 
+					// Add the Y Axis
+					svg.append("g")		
+						.attr("class", "y axis")
+						.call(yAxis);
+						
+					   // append the x line
+					focus.append("line")
+						.attr("class", "x")
+						.style("stroke", "blue")
+						.style("stroke-dasharray", "3,3")
+						.style("opacity", 0.5)
+						.attr("y1", 0)
+						.attr("y2", height);
+
+					// append the y line
+					focus.append("line")
+						.attr("class", "y")
+						.style("stroke", "blue")
+						.style("stroke-dasharray", "3,3")
+						.style("opacity", 0.5)
+						.attr("x1", width)
+						.attr("x2", width);
+
+					// append the circle at the intersection 
+					focus.append("circle")
+						.attr("class", "y")
+						.style("fill", "none")
+						.style("stroke", "blue")
+						.attr("r", 4);
+						
+					    // place the value at the intersection
+					focus.append("text")
+						.attr("class", "y1")
+						.style("stroke", "white")
+						.style("stroke-width", "3.5px")
+						.style("opacity", 0.8)
+						.attr("dx", 8)
+						.attr("dy", "-.3em");
+					focus.append("text")
+						.attr("class", "y2")
+						.attr("dx", 8)
+						.attr("dy", "-.3em");
+
+					// place the date at the intersection
+					focus.append("text")
+						.attr("class", "y3")
+						.style("stroke", "white")
+						.style("stroke-width", "3.5px")
+						.style("opacity", 0.8)
+						.attr("dx", 8)
+						.attr("dy", "1em");
+					focus.append("text")
+						.attr("class", "y4")
+						.attr("dx", 8)
+						.attr("dy", "1em");	
+					
+					// append the rectangle to capture mouse
+					svg.append("rect")
+						.attr("width", width)
+						.attr("height", height)
+						.style("fill", "none")
+						.style("pointer-events", "all")
+						.on("mouseover", function() { focus.style("display", null); })
+						.on("mouseout", function() { focus.style("display", "none"); })
+						.on("mousemove", mousemove)
+						.on("click", function() {
+									
+							var x0 = x.invert(d3.mouse(this)[0]),
+								i = bisectDate(data, x0, 1),
+								d0 = data[i - 1],
+								d1 = data[i],
+								d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+									//alert(d.date+' '+d.deaths)
+									draw(d.date,d.deaths);
+							});						
+
+				  function mousemove() {
+						var x0 = x.invert(d3.mouse(this)[0]),
+							i = bisectDate(data, x0, 1),
+							d0 = data[i - 1],
+							d1 = data[i],
+							d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+						focus.select("circle.y")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")");
+
+						focus.select("text.y1")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")")
+							.text(d.deaths);
+
+						focus.select("text.y2")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")")
+							.text(d.deaths);
+
+						focus.select("text.y3")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")")
+							.text(formatDate(d.date));
+
+						focus.select("text.y4")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")")
+							.text(formatDate(d.date));
+
+						focus.select(".x")
+							.attr("transform",
+								  "translate(" + x(d.date) + "," +
+												 y(d.deaths) + ")")
+									   .attr("y2", height - y(d.deaths));
+
+						focus.select(".y")
+							.attr("transform",
+								  "translate(" + width * -1 + "," +
+												 y(d.deaths) + ")")
+									   .attr("x2", width + width);
+									   
+
+					}			
+				 
+				});
+		}
+		
+		
+		function draw(date, death){	
+
+				deathLocDataByDate = []
+				
+				for (var i=0; i<deathLocDataCopy.length; i++)
+				{ 
+					var parseDate = d3.time.format("%d-%b");
+					var deathDate = parseDate.parse(deathLocDataCopy[i].deathDate);
+
+					var date = new Date(date);
+					var deathDate1 = new Date(deathDate);
+					
+
+						if(date.getTime() == deathDate1.getTime()){
+						//For death scatter plot
+						var object = {
+							x: deathLocDataCopy[i].x,
+							y: deathLocDataCopy[i].y,
+							age:deathLocDataCopy[i].age,
+							gender:deathLocDataCopy[i].gender,
+							deathDate:deathLocDataCopy[i].date
+						};
+						deathLocDataByDate.push(object);
+					}
+				}
+				
+			d3.selectAll("#svg1 g > *").remove();	
+			drawPathMap();
+			drawPumpPlot();
+			drawDealthLocPlot(deathLocDataByDate);
+		}
+		
+		//To draw each death by gender distribution
+		function drawDealthByGender() 
+		{
+			   var margins = {top: 30, right: 50, bottom: 30, left: 50}
+			   var height = 400 - margins.left - margins.right,
+					width = 200 - margins.top - margins.bottom,
+					barPadding = 5
+
+				var yScale = d3.scale.linear()
+				  .domain([0, d3.max(genderDeaths, function(d){
+					return d.y;
+				  })])
+				  .range([height, 0]);
+
+
+				var yAxis = d3.svg.axis()
+				  .scale(yScale)
+				  .orient('left')
+				  .ticks(6);
+
+
+				var xScale = d3.scale.ordinal()
+				  .domain(genderDeaths.map(function(d){
+					return d.x;
+				  }))
+				  .rangeRoundBands([0, width], .1);
+
+				var xAxis = d3.svg.axis()
+				  .scale(xScale)
+				  .orient('bottom');
+
+				var chart = d3.select('#svg3')
+				  
+				  .append('g')
+				  .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+
+				chart.selectAll('rect')
+				  .data(genderDeaths)
+				  .enter()
+				  .append('rect')
+				  .attr('x', function(d, i){
+					return xScale(d.x);
+				  })
+				  .attr('y', function(d){
+					return yScale(d.y);
+				  })
+
+				  .attr('width', (width / genderDeaths.length) - barPadding)
+				  .attr('height', function(d){
+					return height - yScale(d.y);
+				  })
+				  .attr('fill', 'steelblue')
+
+				  
+				  .attr('class', function(d){
+					return d.x;
+				  })
+				  .attr('id', function(d){
+					return d.y;
+				  });
+
+				chart.append('g')
+				  .attr('class', 'aaxis')
+				  .attr('transform', 'translate(-10, 0)')
+				  .call(yAxis);
+
+				chart.append('g')
+				  .attr('class', 'axis')
+				  .attr('transform', 'translate(0,' + (height + 10) + ')')
+				  .call(xAxis);
+
+				/*chart.append('text')
+				  .text('Snow Totals')
+				  .attr('transform', 'translate(-70, -20)'); */
+		}
+		
+		//To draw each death by age distribution
+		function drawDealthByAge() 
+		{
+					var margins = {top: 30, right: 50, bottom: 30, left: 50}
+					var height = 400 - margins.left - margins.right,
+						width = 250 - margins.top - margins.bottom,
+						barPadding = 5
+
+					var yScale = d3.scale.linear()
+					  .domain([0, d3.max(ageDeaths, function(d){
+						return d.y;
+					  })])
+					  .range([height, 0]);
+
+					var yAxis = d3.svg.axis()
+					  .scale(yScale)
+					  .orient('left')
+					  .ticks(5);
+
+					var xScale = d3.scale.ordinal()
+					  .domain(ageDeaths.map(function(d){
+						return d.x;
+					  }))
+					  .rangeRoundBands([0, width], .1);
+
+					var xAxis = d3.svg.axis()
+					  .scale(xScale)
+					  .orient('bottom')
+					  .ticks(5);
+
+					var chart = d3.select('#svg4')
+					  .append('g')
+					  .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+
+					chart.selectAll('rect')
+					  .data(ageDeaths)
+					  .enter()
+					  .append('rect')
+					  .attr('x', function(d, i){
+						return xScale(d.x);
+					  })
+					  .attr('y', function(d){
+						return yScale(d.y);
+					  })
+
+					  .attr('width', (width / ageDeaths.length) - barPadding)
+					  .attr('height', function(d){
+						return height - yScale(d.y);
+					  })
+					  .attr('fill', 'steelblue')
+
+					  
+					  .attr('class', function(d){
+						return d.x;
+					  })
+					  .attr('id', function(d){
+						return d.y;
+					  });
+
+					chart.append('g')
+					  .attr('class', 'axis')
+					  .attr('transform', 'translate(-10, 0)')
+					  .call(yAxis);
+
+					chart.append('g')
+					  .attr('class', 'xaxis')
+					  .attr('transform', 'translate(0,' + (height + 10) + ')')
+					  .call(xAxis);
+					  
+					chart.selectAll(".xaxis text")  // select all the text elements for the xaxis
+					  .attr("transform", function(d) {
+						  return "translate(" + this.getBBox().height*-2 + "," + this.getBBox().height + ")rotate(-45)";
+					});  
+
+					/*chart.append('text')
+					  .text('Snow Totals')
+					  .attr('transform', 'translate(-70, -20)');	*/
+		
+		}
+		
+		
+		//------------------------------------------------------Data Functions--------------------
+		//gives the coordinates of the streets as a series of line segments
+		
+		function drawPathMap(){
+				d3.json("streets.json", function(error, graph)
+				{ 
+					if (error) return console.warn(error);		
+					for (var i=0; i<graph.length; i++)
+						{
+						 pathData = []
+						 var record = graph[i];
+						 for (var j=0; j<record.length; j++)
+						  {
+								
+								var object = {
+												x: record[j].x,
+												y: record[j].y
+											 };
+								pathData.push(object);  
+						  }		  
+						  drawPathPlot();
+						}	
+				})
+		  }
+		  
+		drawPathMap();  
+		 
+		//gives the locations of the 13 nearby pumps
+		d3.csv('pumps.csv', function(data) 
+		{
+			for (var i=0; i<data.length; i++)
+			{
+					
+					var object = {
+						x: data[i].x,
+						y: data[i].y
+					};
+
+					pumpData.push(object);
+					
+					
+			}
+			drawPumpPlot();
+		});
+		
+		
+		//gives the location of each death in the deathdays file, in order, plus information on the age and sex of the victim
+		d3.csv('deaths_age_sex.csv', function(data) 
+		{
+		   var deathLocData = [];
+			for (var i=0; i<data.length; i++)
+			{ 
+			       
+					//For death scatter plot
+					var object = {
+						x: data[i].x,
+						y: data[i].y,
+						age:data[i].age,
+						gender:data[i].gender,
+						deathDate:data[i].date
+					};
+					
+					deathLocData.push(object);
+					
+					//For distribution of death by gender
+					totalDeaths = data.length;
+					if(data[i].gender == '0'){
+					  totalMaleDeaths = totalMaleDeaths +1;
+					}
+					else{
+					  totalFemaleDeaths = totalFemaleDeaths+1;
+					}
+					
+
+					
+					//For distribution of death by age
+					if(data[i].age<=10){
+										ageGroup10 = ageGroup10+1;
+					}else if(data[i].age>=11 && data[i].age<=20){
+										ageGroup20 = ageGroup20+1;
+					}else if(data[i].age>=21 && data[i].age<=40){
+										ageGroup40 = ageGroup40+1;
+					}else if(data[i].age>=41 && data[i].age<=60){
+										ageGroup60 = ageGroup60+1;
+					}else if(data[i].age>=61 && data[i].age<=80){
+										ageGroup80 = ageGroup80+1;
+					}else{
+										ageGroup100 = ageGroup100+1;
+					}
+			
+			}
+			
+			
+					var object1 = {
+						x: 'Male Death',
+						y: totalMaleDeaths
+					};
+					genderDeaths.push(object1);
+					var object1 = {
+						x: 'Female Death',
+						y: totalFemaleDeaths
+					};
+					genderDeaths.push(object1);
+					
+					
+					var object1 = {
+						x: '0-10',
+						y: ageGroup10
+					};
+					ageDeaths.push(object1);
+					
+					var object1 = {
+						x: '11-20',
+						y: ageGroup20
+					};
+					ageDeaths.push(object1);
+					
+					var object1 = {
+						x: '21-40',
+						y: ageGroup40
+					};
+					ageDeaths.push(object1);
+					
+					var object1 = {
+						x: '41-60',
+						y: ageGroup60
+					};
+					ageDeaths.push(object1);	
+					
+					var object1 = {
+						x: '61-80',
+						y: ageGroup80
+					};
+					ageDeaths.push(object1);
+					
+					var object1 = {
+						x: '81-100',
+						y: ageGroup100
+					};
+					ageDeaths.push(object1);	
+						
+					deathLocDataCopy = deathLocData;		
+					drawDealthLocPlot(deathLocData);
+					
+					drawDealthByGender();
+					
+					drawDealthByAge();
+		});	
+
+
+			drawTimelineDeathsPerDay();
+
+
+		
+		//----------------------------------------------------------------------------------------------------------------
+	</script>
+</body>
+
+
+</html>
