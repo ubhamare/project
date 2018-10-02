@@ -4,97 +4,159 @@
 	<title> Ganpati Bappa Morya</title>
 	<script src="https://d3js.org/d3.v3.min.js"></script>
 	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src = "http://axc.net/code_libraries/lasso/lasso.min.js"></script>
 	<style>
-    	text { 
-			font-family: Arial; 
-			font-size: 12px;
-		}
-		.axis path, .axis line {
-			fill: none;
-			stroke: black;
-			shape-rendering: crispEdges;
-		}
-		.tick text {
-			fill: black;
-			font-size: 11px;
-		}
-		
-		.xaxis .text{
-		padding-left:2 px;
-		
-		}
-		
-		.svg-align{
-		padding-top: 0px;
-		padding-left: 0px;
-		}
-		
-		.svg-align1{
-		padding-top: 50px;
-		padding-left: 0px;
-		}
+					svg {
+					  font: 10px sans-serif;
+					}
 
-		/*rect {
-			stroke: white;
-		}*/
-		
-		div.tooltip {	
-			position: absolute;			
-			text-align: center;			
-			width: 60px;					
-			height: 28px;					
-			padding: 2px;				
-			font: 8px sans-serif;		
-			background: lightsteelblue;	
-			border: 0px;		
-			border-radius: 8px;			
-			pointer-events: none;			
-		}
-		
-		/*body { font: 12px Arial;}*/
- 
-		path { 
-		  stroke: steelblue;
-		  stroke-width: 2;
-		  fill: none;
-		}
-		 
-		.axis path,
-		.axis line {
-			fill: none;
-			stroke: grey;
-			stroke-width: 1;
-			shape-rendering: crispEdges;
-		}
-		
+					.valueline {
+					 fill: none;
+							stroke: steelblue;
+							stroke-width: 1.5px;
+					}
+
+					.axis path,
+					.axis line {
+					  fill: none;
+					  stroke: #000;
+					  shape-rendering: crispEdges;
+					}
+
+					.brush .extent {
+					  stroke: #fff;
+					  fill-opacity: .125;
+					  shape-rendering: crispEdges;
+					  clip-path: url(#clip);
+					}
+
+					rect.pane {
+					  cursor: move;
+					  fill: none;
+					  pointer-events: all;
+					}
+
+					text { 
+						font-family: Arial; 
+						font-size: 12px;
+					}
+					.axis path, .axis line {
+						fill: none;
+						stroke: black;
+						shape-rendering: crispEdges;
+					}
+					.tick text {
+						fill: black;
+						font-size: 11px;
+					}
+
+					.xaxis .text{
+					padding-left:2 px;
+
+					}
+
+					.svg-align{
+					padding-top: 0px;
+					padding-left: 0px;
+					}
+
+					.svg-align1{
+					padding-top: 50px;
+					padding-left: 0px;
+					}
+
+					/*rect {
+						stroke: white;
+					}*/
+
+					div.tooltip {	
+						position: absolute;			
+						text-align: center;			
+						width: 60px;					
+						height: 28px;					
+						padding: 2px;				
+						font: 8px sans-serif;		
+						background: lightsteelblue;	
+						border: 0px;		
+						border-radius: 8px;			
+						pointer-events: none;			
+					}
+
+					/*body { font: 12px Arial;}*/
+
+					path { 
+					  stroke: steelblue;
+					  stroke-width: 2;
+					  fill: none;
+					}
+					 
+					.axis path,
+					.axis line {
+						fill: none;
+						stroke: grey;
+						stroke-width: 1;
+						shape-rendering: crispEdges;
+					}
+
+					#svg2 g{
+					 padding-top:20px;
+
+					}
+					
+					.project-title
+					{
+					    width: 100%;
+						text-align: center;
+						font-size: 35px;
+						font-family: sans-serif;
+						color:blue;
+					}
+					
+					.doc-link					
+					{
+					    width: 100%;
+						text-align: right;
+						font-size: 20px;
+						font-family: sans-serif;
+						color:blue;
+						padding-right:10px;
+					}
 		
 	</style>
 </head>
 <body>
-    <div> </div>
-   
-	<svg id="svg1" class="svg-align" width="400" height="500">
+    <div class="project-title"> Project 1 </div>
+	<div class="doc-link"> <a href link="aboutme.html" title="Documentation"> About </a></div>
+	<div class="doc-link"> <a href link="aboutproject.html" title="Documentation"> Documentation Link </a></div>
+     
+	 
+	<svg id="svg1" class="svg-align" width="620" height="500"> 
+	
 		<g transform="translate(30,40)"></g>
 	</svg>
 	
-	<svg id="svg2" width="500" height="412">
-		<g transform="translate(30,40)" ></g>
+	<svg id="svg2" width="620" height="500">
+		
 	</svg>
 	
-	<svg id="svg3" width="450" height="500">	
-		<g transform="translate(30,40)"></g>
+	<svg id="svg3" width="620" height="500">	
+		
 	</svg>
 	
-	<svg id="svg4" width="450" height="500">	
-		<g transform="translate(30,40)"></g>
+	<svg id="svg4" width="620" height="500">	
+		
+	</svg>
+	
+	<svg id="svg5" width="620" height="500">	
+		
 	</svg>
 
 	
 	<script>
 	    //-------------------------------------------------------------Global Variable--------------------
         //Global variables
-		var CHART_WIDTH = 490;
-		var CHART_HEIGHT = 200;
+		var CHART_WIDTH = 420;
+		var CHART_HEIGHT = 450;
 		var MAX_BAR_HEIGHT = 100;
 		var padding = 100;
 		
@@ -128,77 +190,175 @@
         //To draw paths  		
 		function drawPathPlot() 
 		{
+		
+			var xScale = d3.scale.linear();
+			var yScale = d3.scale.linear();
+
+			xScale.domain([0,200]).range([0, CHART_WIDTH]);
+			yScale.domain([0,200]).range([CHART_HEIGHT,0]);
+		
 			var pathGenerator = d3.svg.line()
-				.x(function(d) { return d.x*16; })
-				.y(function(d) { return d.y*16; });
-
+				.x(function(d) { return xScale(d.x*10); })
+				.y(function(d) { return yScale(d.y*10); });
+					
 			var g = d3.select('#svg1').select('g');
-
+			
     		g.append('path')
     			.style('fill', 'none')
-    			.style('stroke', 'grey')
-    			.style('stroke-width', '3px')
-    			.attr('d', pathGenerator(pathData))
-				.call(d3.behavior.zoom().on("zoom", function () {
-					g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-				  }));
-		}
+    			.style('stroke', 'black')
+    			.style('stroke-width', '1.5px')
+    			.attr('d', pathGenerator(pathData));
+				
+				
+			g.append("text")
+				.attr("x", (CHART_WIDTH / 2))             
+				.attr("y", 0 - (10 / 2))
+				.attr("text-anchor", "middle")  
+				.style("font-size", "16px") 
+				
+				.style("text-decoration", "underline")  
+				.text("Map of London's 1854 cholera epidemic");	
+				
+           }
+		
 		
 		//To draw pumps loc
 		function drawPumpPlot() 
 		{
+		
+		   	var xScale = d3.scale.linear();
+			var yScale = d3.scale.linear();
+
+			xScale.domain([0,200]).range([0, CHART_WIDTH]);
+			yScale.domain([0,200]).range([CHART_HEIGHT,0]);
+			
 			var g = d3.select('#svg1').select('g');
 
     		g.selectAll('circle')
     			.data(pumpData)
     			.enter()
     			.append('circle')
-    			.style('fill', 'red')
+    			.style('fill', 'blue')
     			.attr('r', 4)
-    			.attr('cx', function(d) { return d.x*16 })
-    			.attr('cy', function(d) { return d.y*16 });
+    			.attr('cx', function(d) { return xScale(d.x*10) })
+    			.attr('cy', function(d) { return yScale(d.y*10) });
 		}
+		
 		
 		//To draw each death location
 		function drawDealthLocPlot(deathLocData) 
 		{
+			var xScale = d3.scale.linear();
+			var yScale = d3.scale.linear();
+
+			xScale.domain([0,200]).range([0, CHART_WIDTH]);
+			yScale.domain([0,200]).range([CHART_HEIGHT,0]);
+		
 			var g = d3.select('#svg1').select('g');
             var tooltip = d3.select("body")
 						.append("div")
 						.style("position", "absolute")
 						.style("z-index", "10")
 						.style("visibility", "hidden")
+			//-----------------------
+                		var lasso_start = function() {
+						  lasso.items()
+							.attr("r",1) // reset size
+							.style("fill","grey") // clear all of the fills
+							.classed({"not_possible":true,"selected":false}); // style as not possible
+						};
+
+						var lasso_draw = function() {
+						  // Style the possible dots
+						  lasso.items().filter(function(d) {return d.possible===true})
+							.classed({"not_possible":false,"possible":true});
+
+						  // Style the not possible dot
+						  lasso.items().filter(function(d) {return d.possible===false})
+							.classed({"not_possible":true,"possible":false});
+						};
+
+						var lasso_end = function() {
+						  // Reset the color of all dots
+						  lasso.items()
+							 .style("fill", function(d) { if(d.gender=='1') return '#00b8e6'; else return 'orange'; } );
+
+						  // Style the selected dots
+						  lasso.items().filter(function(d) {return d.selected===true})
+							.classed({"not_possible":false,"possible":false})
+							.attr("r",3);
+
+						  // Reset the style of the not selected dots
+						  lasso.items().filter(function(d) {return d.selected===false})
+							.classed({"not_possible":false,"possible":false})
+							.attr("r",1);
+							
+							
+							var selected = lasso.items().filter(function(d){
+									return d.selected===true 
+								}); 
+
+						};
+
+						// Create the area where the lasso event can be triggered
+						var lasso_area = g.append("rect")
+											  .attr("width",620)
+											  .attr("height",500)
+											  .style("opacity",0);
+											  
+											  
+											  
+						// Define the lasso
+						var lasso = d3.lasso()
+							  .closePathDistance(75) // max distance for the lasso loop to be closed
+							  .closePathSelect(true) // can items be selected by closing the path?
+							  .hoverSelect(true) // can items by selected by hovering over them?
+							  .area(lasso_area) // area where the lasso can be started
+							  .on("start",lasso_start) // lasso start function
+							  .on("draw",lasso_draw) // lasso draw function
+							  .on("end",lasso_end); // lasso end function
+
+						// Init the lasso on the svg:g that contains the dots
+						g.call(lasso);	
+
+
+            //----------------------------			
 			
-    		g.selectAll('circle')
+    		g.selectAll('.dot')
     			.data(deathLocData)
     			.enter()
     			.append('circle')
-    			.style('fill', function(d) {  if(d.gender=='1') return 'blue'; else return 'orange'; })
+				.attr("class", "dot")
+    			.style('fill', function(d) {  if(d.gender=='1') return '#00b8e6'; else return 'orange'; })
     			.attr('r', 1)
-    			.attr('cx', function(d) { return d.x*16 })
-    			.attr('cy', function(d) { return d.y*16 })
+    			.attr('cx', function(d) { return xScale(d.x*10) })
+    			.attr('cy', function(d) { return yScale(d.y*10) })
 			    .on("mouseover", function(d) {		
-					div.transition()		
-				    .duration(200)		
-					.style("opacity", .9);		
-					div.html("Age:" + "<br/>"+d.age)	
-					.style("left", (d3.event.pageX) + "px")		
-					.style("top", (d3.event.pageY - 28) + "px");	
-					})					
+												div.transition()		
+												.duration(200)		
+												.style("opacity", .9);		
+												div.html("Age:" + "<br/>"+d.age)	
+												.style("left", (d3.event.pageX) + "px")		
+												.style("top", (d3.event.pageY - 28) + "px");	
+				})					
 				.on("mouseout", function(d) {		
-							div.transition()		
-							.duration(500)		
-							.style("opacity", 0);	
-					});
+												div.transition()		
+												.duration(500)		
+												.style("opacity", 0);	
+				});
+				
+				//-------------
+				lasso.items(d3.selectAll(".dot"));
+				//------------
+				
 		}
-		
 		//To make graph interactive
 		function drawTimelineDeathsPerDay(){
 
 				// Set the dimensions of the canvas / graph
-				var	margin = {top: 30, right: 20, bottom: 30, left: 50},
+				var	margin = {top: 90, right: 20, bottom: 30, left: 40},
 					width = 500 - margin.left - margin.right,
-					height = 250 - margin.top - margin.bottom;
+					height = 370 - margin.top - margin.bottom;
 				 
 				// Parse the date / time
 				//var parseDate = d3.time.format("%d-%b-%y").parse;
@@ -250,20 +410,44 @@
 					
 					
 					// Add the valueline path.
-				/*	svg.append("path")	
-						.attr("class", "line")
-						.attr("d", valueline(data)); */
+					/*svg.append("path")	
+							.attr("class", "line")
+							.attr("d", valueline(data)); */
 				 
 					// Add the X Axis
 					svg.append("g")		
 						.attr("class", "x axis")
 						.attr("transform", "translate(0," + height + ")")
 						.call(xAxis);
+						
+					svg.append("text")      // text label for the x axis
+						.attr("x", width / 2 )
+						.attr("y",  height + margin.bottom+20)
+						.style("text-anchor", "middle")
+						.text("Dates");	
+					
+                    //Y axis text					
+					svg.append("text")
+						.attr("transform", "rotate(-90)")
+						.attr("y", 0 - margin.left)
+						.attr("x",0 - (height / 2))
+						.attr("dy", "1em")
+						.style("text-anchor", "middle")
+						.text("Death Count");	
 				 
 					// Add the Y Axis
 					svg.append("g")		
 						.attr("class", "y axis")
 						.call(yAxis);
+					//Show Map Title	
+					svg.append("text")
+					.attr("x", (width / 2))             
+					.attr("y", 0 - (margin.top / 2))
+					.attr("text-anchor", "middle")  
+					.style("font-size", "16px") 
+					.style("font-weight", "bold") 
+					.style("text-decoration", "underline")  
+					.text("Timeline graph showing the number of deaths per day");		
 						
 					   // append the x line
 					focus.append("line")
@@ -429,7 +613,7 @@
 			   var margins = {top: 30, right: 50, bottom: 30, left: 50}
 			   var height = 400 - margins.left - margins.right,
 					width = 200 - margins.top - margins.bottom,
-					barPadding = 5
+					barPadding = 0
 
 				var yScale = d3.scale.linear()
 				  .domain([0, d3.max(genderDeaths, function(d){
@@ -457,7 +641,7 @@
 				var chart = d3.select('#svg3')
 				  
 				  .append('g')
-				  .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+				  .attr('transform', 'translate(' + (margins.left+50) + ',' + margins.top + ')');
 
 				chart.selectAll('rect')
 				  .data(genderDeaths)
@@ -470,7 +654,7 @@
 					return yScale(d.y);
 				  })
 
-				  .attr('width', (width / genderDeaths.length) - barPadding)
+				  .attr('width', 30)
 				  .attr('height', function(d){
 					return height - yScale(d.y);
 				  })
@@ -493,10 +677,34 @@
 				  .attr('class', 'axis')
 				  .attr('transform', 'translate(0,' + (height + 10) + ')')
 				  .call(xAxis);
+				
+				// text label for the x axis
+				chart.append("text")      
+					.attr("x", width / 2 )
+					.attr("y",  height + margins.bottom+20)
+					.style("text-anchor", "middle")
+					.text("Gender");	
+					
+				//Y axis text					
+				chart.append("text")
+					.attr("transform", "rotate(-90)")
+					.attr("y", 0 - margins.left)
+					.attr("x",0 - (height / 2))
+					.attr("dy", "1em")
+					.style("text-anchor", "middle")
+					.text("Death Count");	
 
-				/*chart.append('text')
-				  .text('Snow Totals')
-				  .attr('transform', 'translate(-70, -20)'); */
+				//Show Map Title	
+				chart.append("text")
+					.attr("x", (width / 2))             
+					.attr("y", 0 - (margins.top / 2))
+					.attr("text-anchor", "middle")  
+					.style("font-size", "16px") 
+					.style("font-weight", "bold") 
+					.style("text-decoration", "underline")  
+					.text("Distribution of deaths by Gender ");		
+					
+
 		}
 		
 		//To draw each death by age distribution
@@ -531,7 +739,7 @@
 
 					var chart = d3.select('#svg4')
 					  .append('g')
-					  .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+					  .attr('transform', 'translate(' + (margins.left+50) + ',' + margins.top + ')');
 
 					chart.selectAll('rect')
 					  .data(ageDeaths)
@@ -568,14 +776,197 @@
 					  .attr('transform', 'translate(0,' + (height + 10) + ')')
 					  .call(xAxis);
 					  
+					 // text label for the x axis
+					chart.append("text")     
+						.attr("x", width / 2 +10)
+						.attr("y",  height + margins.bottom+40)
+						.style("text-anchor", "middle")
+						.text("Age Group");	
+					
+				     //Y axis text					
+					chart.append("text")
+						.attr("transform", "rotate(-90)")
+						.attr("y", 0 - margins.left)
+						.attr("x",0 - (height / 2))
+						.attr("dy", "1em")
+						.style("text-anchor", "middle")
+						.text("Death Count"); 
+                    
+														//Show Map Title	
+					chart.append("text")
+					.attr("x", (width / 2))             
+					.attr("y", 0 - (margins.top / 2))
+					.attr("text-anchor", "middle")  
+					.style("font-size", "16px") 
+					.style("font-weight", "bold") 
+					.style("text-align", "center") 
+					.style("text-decoration", "underline")  
+					.text("Distribution of deaths by Age ");	
+						
+					  
 					chart.selectAll(".xaxis text")  // select all the text elements for the xaxis
-					  .attr("transform", function(d) {
+						.attr("transform", function(d) {
 						  return "translate(" + this.getBBox().height*-2 + "," + this.getBBox().height + ")rotate(-45)";
 					});  
 
-					/*chart.append('text')
-					  .text('Snow Totals')
-					  .attr('transform', 'translate(-70, -20)');	*/
+					
+		
+		}
+		
+		
+		function lineGraphWindow(){
+		
+									// Set the dimensions of the canvas / graph
+							var	margin = {top: 10, right: 20, bottom: 100, left: 40},
+								width = 500 - margin.left - margin.right,
+								height = 370 - margin.top - margin.bottom;	
+								
+							var  margin2 = {top: 300, right: 10, bottom: 20, left: 40},
+								 height2 = 370 - margin2.top - margin2.bottom;
+
+							var parseDate = d3.time.format("%d-%b");
+							var formatDate = d3.time.format("%d-%b");
+							var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+							var x = d3.time.scale().range([0, width]),
+								x2 = d3.time.scale().range([0, width]),
+								y = d3.scale.linear().range([height, 0]),
+								y2 = d3.scale.linear().range([height2, 0]);
+
+							var xAxis = d3.svg.axis().scale(x).orient("bottom"),
+								xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
+								yAxis = d3.svg.axis().scale(y).orient("left");
+
+							var brush = d3.svg.brush()
+								.x(x2)
+								.on("brush", brushed);
+
+							var valueline = d3.svg.line()
+							   // .interpolate("monotone")
+								.x(function(d) { return x(d.date); })
+							   // .y0(height)
+								.y(function(d) { return y(d.deaths); });
+
+							var valueline2 = d3.svg.line()
+								//.interpolate("monotone")
+								.x(function(d) { return x2(d.date); })
+								//.y0(height2)
+								.y(function(d) { return y2(d.deaths); });
+
+								
+								// Adds the svg canvas
+								var	svg = d3.select("#svg5")
+									.append("g")
+										.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+										
+								svg.append("defs").append("clipPath")
+									.attr("id", "clip")
+								  .append("rect")
+									.attr("width", width)
+									.attr("height", height);
+
+								var focus = svg.append("g")
+									.attr("class", "focus")
+									.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+								var context = svg.append("g")
+									.attr("class", "context")
+									.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+								var zoom = d3.behavior.zoom()
+									.on("zoom", draw);
+								
+								// Add rect cover the zoomed graph and attach zoom event.
+								var rect = svg.append("svg:rect")
+									.attr("class", "pane")
+									.attr("width", width)
+									.attr("height", height)
+									.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+									.call(zoom);
+
+								d3.csv("deathdays.csv",function(error, data) {
+
+										data.forEach(function(d) {
+											d.date =  parseDate.parse(d.date);
+											d.deaths = +d.deaths;
+										});
+
+									  
+									  // Scale the range of the data
+										x.domain(d3.extent(data, function(d) { return d.date; }));
+										y.domain([0, d3.max(data, function(d) { return d.deaths; })]);
+										
+
+									  x2.domain(x.domain());
+									  y2.domain(y.domain());
+
+									  // Set up zoom behavior
+									  zoom.x(x);
+
+									  focus.append("path")
+										  .datum(data)
+										  .attr("class", "valueline")
+										  .attr("d", valueline);
+
+									  focus.append("g")
+										  .attr("class", "x axis")
+										  .attr("transform", "translate(0," + height + ")")
+										  .call(xAxis);
+
+									  focus.append("g")
+										  .attr("class", "y axis")
+										  .call(yAxis);
+													//Show Map Title	
+									  svg.append("text")
+											.attr("x", (width / 2) )             
+											.attr("y", 2 )
+											.attr("text-anchor", "middle")  
+											.style("font-size", "16px") 
+											.style("font-weight", "bold") 
+											.style("text-decoration", "underline")  
+											.text("Death Count between two Dates");		  
+
+									  context.append("path")
+										  .datum(data)
+										  .attr("class", "valueline")
+										  .attr("d", valueline2);
+
+									  context.append("g")
+										  .attr("class", "x axis")
+										  .attr("transform", "translate(0," + height2 + ")")
+										  .call(xAxis2);
+
+									  context.append("g")
+										  .attr("class", "x brush")
+										  .call(brush)
+										.selectAll("rect")
+										  .attr("y", -6)
+										  .attr("height", height2 + 7);
+
+									});
+									
+									function brushed() {
+									  x.domain(brush.empty() ? x2.domain() : brush.extent());
+									  focus.select(".valueline").attr("d", valueline);
+									  focus.select(".x.axis").call(xAxis);
+									  // Reset zoom scale's domain
+									  zoom.x(x);
+									}
+
+									function draw() {
+									  focus.select(".valueline").attr("d", valueline);
+									  focus.select(".x.axis").call(xAxis);
+									  // Force changing brush range
+									  brush.extent(x.domain());
+									  svg.select(".brush").call(brush);
+									}
+
+									function type(d) {
+									  d.date = parseDate(d.date);
+									  d.deaths = +d.deaths;
+									  return d;
+									}
+		
 		
 		}
 		
@@ -671,8 +1062,7 @@
 					}
 			
 			}
-			
-			
+
 					var object1 = {
 						x: 'Male Death',
 						y: totalMaleDeaths
@@ -731,9 +1121,7 @@
 
 
 			drawTimelineDeathsPerDay();
-
-
-		
+			lineGraphWindow();
 		//----------------------------------------------------------------------------------------------------------------
 	</script>
 </body>
