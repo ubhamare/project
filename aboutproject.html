@@ -1,10 +1,57 @@
 <html>
 
 <head>
-           <title> Project Documentation </title>
+           <title> About Project </title>
+<style>
+
+table {
+    border: 1px solid black;
+	align: center;
+}
+
+</style>
+		   
 </head>
 <body>
-
+<br/> <br/>
+<h1 align="center"> Project Documentation </h1>
+<br/> <br/>
+<div align="center">
+	<table>
+	<tr> <td> <h1 align="center"> Youtube Video of Visualization </h1> </td> </tr> 
+	<tr> <td><iframe width="560" height="315" src="https://www.youtube.com/embed/AdSZJzb-aX8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> </td> </tr> 
+	</table>
+</div>
+<br/> <br/>
+<table style="width:100%">
+  <tr> <td colspan="2"></td></tr>
+  <tr> 
+	  <td><b> Design process: </b> </td>
+	  <td align="justify">I found that the design of a visualization is critical and complex process. Designing visualization requires consideration of various factors like best way of representing data among all available options, selection of colors considering people with various vision deficiency etc.
+	Initially, while plotting the map I was not able to plot the points in a correct sequence, once I completed, I found that map is correct but rotated by 160 degree. Then, I got to know the importance of correct scaling. With the proper scaling of that I fixed that.
+	<br/>
+	Before Scaling:
+	<br/>
+	 <img src="../before.png" alt="Smiley face" height="100px" width="100px">
+	 <br/>
+	 <br/>
+	After Scaling:
+	<br/>
+	<img src="../after.png" alt="Smiley face" height="100px" width="100px">
+	<br/><br/>
+	Even if having development and javascript background, I struggled a bit while designing a visualization with d3.js but now (in later stages of project) am more comfortable with it.
+	 </td> 
+ </tr>
+  <tr> 
+	  <td><b> Rationale of your design choices:</b></td>
+	  
+	  <td> 	<br/><br/> Initially, I plotted and placed the map of London's 1854 cholera epidemic with pumps and victims. After that I placed timeline graph showing deaths per day, as the selection on timeline graph refreshes the map contents. For this graph, I chose line graph over bar graph because I thought it’s a best way to represent this. While choosing colors, I selected the colors adaptable to the color blind people. And also in order to distinguish between male and female victims, I used unique colors. After this graph, I placed remaining required graphs. 	<br/><br/></td> 
+   </tr>
+  <tr> 
+	  <td><b> Visualizations to discover facts:</b></td>
+	  <td> </td>
+  </tr>
+</table>
 
 </body>
 
