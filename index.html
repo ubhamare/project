@@ -919,6 +919,8 @@
 								xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
 								yAxis = d3.svg.axis().scale(y).orient("left");
 
+							var tot=0; 
+							
 							var brush = d3.svg.brush()
 								.x(x2)
 								.on("brush", brushed);
@@ -1087,6 +1089,15 @@
 									  d.deaths = +d.deaths;
 									  return d;
 									}
+									
+									svg.append("text")
+												.attr("x", 150)             
+												.attr("y", 400)
+												.attr("id", "tot_txt")
+												.attr("text-anchor", "middle")  
+												.style("font-size", "16px") 	
+												.style("text-decoration", "underline")  
+												.text("Total Deaths: "+tot);
 		
 		
 		}
