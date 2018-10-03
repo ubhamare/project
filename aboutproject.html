@@ -26,6 +26,40 @@ table {
 <table style="width:100%">
   <tr> <td colspan="2"></td></tr>
   <tr> 
+	<td> <b> Functionalities Implemented: </b>  </td>
+	<td>  
+	        <b>1) Implemented Map of London's 1854 cholera epidemic with pumps, victims & labels to the street, brewery & work house </b>
+				<br/><br/>
+				<b> Representation of elements: </b>				
+				<br/>
+				Blue circle: pump
+				<br/>
+				Orange circle: Male
+				<br/>
+				Grey blue circle: Female
+				<br/><br/>
+				<b> Functionalities: </b>
+				<br/>
+				Clustering the death points
+				<br/>
+				Zooming the map
+				<br/>
+				Tooltip to victims with age and gender
+		       <br/><br/>
+		    <b> 2)Implemented timeline graph showing the number of deaths per day</b>
+			<br/><br/>
+              Selecting point on the graph shows date and deaths on that particular day & refreshes the death victims on other Map of London's 1854 cholera epidemic.
+			<br/><br/>
+			<b> 3)Implemented graph representing distribution of deaths by Gender</b>
+			<br/><br/>
+            <b> 4)Implemented graph representing distribution of deaths by Age	</b>
+			<br/><br/>
+            <b> 5)Implemented graph representing death count between two dates using brush & window selection.</b>	
+<br/><br/>			
+
+	</td>
+  </tr>
+  <tr> 
 	  <td><b> Design process: </b> </td>
 	  <td align="justify">I found that the design of a visualization is critical and complex process. Designing visualization requires consideration of various factors like best way of representing data among all available options, selection of colors considering people with various vision deficiency etc.
 	Initially, while plotting the map I was not able to plot the points in a correct sequence, once I completed, I found that map is correct but rotated by 160 degree. Then, I got to know the importance of correct scaling. With the proper scaling of that I fixed that.
@@ -39,7 +73,10 @@ table {
 	<br/>
 	<img src="https://raw.githubusercontent.com/ubhamare/ubhamare.github.io/master/after.PNG" alt="Smiley face" height="100px" width="100px">
 	<br/><br/>
+	
+	I also faced some issue while integration of zoom along with clustering. So, added separate link to the map with zooming capabilities (Top Right Corner).
 	Even if having development and javascript background, I struggled a bit while designing a visualization with d3.js but now (in later stages of project) am more comfortable with it.
+	
 	 </td> 
  </tr>
   <tr> 
