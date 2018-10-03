@@ -955,15 +955,16 @@
 									.attr("height", height)
 									.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 									.call(zoom);
-
+                                 
+								var data_bk= []; 
 								d3.csv("deathdays.csv",function(error, data) {
-
+   
 										data.forEach(function(d) {
 											d.date =  parseDate.parse(d.date);
 											d.deaths = +d.deaths;
 										});
 
-									  
+									  data_bk=data;
 									  // Scale the range of the data
 										x.domain(d3.extent(data, function(d) { return d.date; }));
 										y.domain([0, d3.max(data, function(d) { return d.deaths; })]);
