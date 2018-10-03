@@ -1009,6 +1009,15 @@
 											.style("text-decoration", "underline")  
 											.text("Death Count between two Dates");		  
 
+									//Y axis text					
+									svg.append("text")
+										.attr("transform", "rotate(-90)")
+										.attr("y", 0 - margin.left)
+										.attr("x",0 - (height / 2))
+										.attr("dy", "1em")
+										.style("text-anchor", "middle")
+										.text("Death Count");	
+											
 									  context.append("path")
 										  .datum(data)
 										  .attr("class", "valueline")
