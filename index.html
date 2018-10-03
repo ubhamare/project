@@ -1056,7 +1056,7 @@
 										  
   										  if(date1!=null){
 
-											  if(date1.getTime()>start_dt.getTime() ){
+											  if((date1.getTime()>=start_dt.getTime())&&(date1.getTime()<=end_dt.getTime())){
 												total_deaths = total_deaths+data_bk[key]['deaths'];
 												}
 											 }	
