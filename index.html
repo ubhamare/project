@@ -1017,10 +1017,39 @@
 
 									});
 									
+									var selected_dates;
+									var tot;
 									function brushed() {
 									  x.domain(brush.empty() ? x2.domain() : brush.extent());
 									  focus.select(".valueline").attr("d", valueline);
 									  focus.select(".x.axis").call(xAxis);
+									  
+									  selected_dates = brush.extent();
+									  start_dt = selected_dates[0];
+									  end_dt = selected_dates[1];
+					                  
+									  var total_deaths = 0;
+
+										Object.keys(data_bk).forEach(function(key) {
+  
+										  date1 = data_bk[key]['date'];
+										  
+  										  if(date1!=null){
+
+											  if(date1.getTime()>start_dt.getTime() ){
+												total_deaths = total_deaths+data_bk[key]['deaths'];
+												}
+											 }	
+
+											});
+											
+											tot= total_deaths;	
+											console.log(tot);
+											
+										   if(total_deaths !=null){
+									       alert('Total Deaths between '+start_dt +' and '+ end_dt+' is '+ total_deaths);
+									     }
+									  
 									  // Reset zoom scale's domain
 									  zoom.x(x);
 									}
